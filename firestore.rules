@@ -11,16 +11,22 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
+    function userExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
     function isAdmin() {
-      return isSignedIn() && userDoc().data.role == 'admin';
+      return isSignedIn() && userExists() && userDoc().data.role == 'admin';
     }
 
     function isStaffOrAdmin() {
-      return isSignedIn() && userDoc().data.role in ['admin', 'staff'];
+      return isSignedIn() && userExists() && userDoc().data.role in ['admin', 'staff'];
     }
 
     match /users/{userId} {
-      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow read: if isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId;
       allow create: if isAdmin();
       allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
       allow delete: if isAdmin();

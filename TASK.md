@@ -20,77 +20,77 @@
 
 ## Phase 2 — Auth (Admin/Staff)
 
-- [ ] Tạo `useAuthStore` (Zustand) — lưu user session + role
-- [ ] Tạo hook `useAuth` — firebase auth listener
-- [ ] Tạo trang `/admin/login` — form email/password + validation Zod
-- [ ] Tạo middleware Next.js — bảo vệ route `/admin/*`
-- [ ] Tạo helper `createStaffAccount` cho admin tạo tài khoản staff
+- [x] Tạo `useAuthStore` (Zustand) — lưu user session + role
+- [x] Tạo hook `useAuth` — firebase auth listener
+- [x] Tạo trang `/admin/login` — form email/password + validation Zod
+- [x] Tạo middleware Next.js — bảo vệ route `/admin/*`
+- [x] Tạo helper `createStaffAccount` cho admin tạo tài khoản staff
 
 ---
 
 ## Phase 3 — Quản lý Menu (Admin)
 
-- [ ] Tạo Firestore service: `menuService.ts` (CRUD menuItems + categories)
-- [ ] Tạo hook `useMenuItems` — fetch + realtime
-- [ ] Tạo trang `/admin/menu` — danh sách món, filter, search
-- [ ] Tạo component `MenuItemForm` — thêm/sửa món (React Hook Form + Zod)
-- [ ] Tích hợp upload ảnh lên Firebase Storage (có compress)
-- [ ] Tạo component `CategoryManager` — CRUD category
+- [x] Tạo Firestore service: `menuService.ts` (CRUD menuItems + categories)
+- [x] Tạo hook `useMenuItems` — fetch + realtime
+- [x] Tạo trang `/admin/menu` — danh sách món, filter, search
+- [x] Tạo component `MenuItemForm` — thêm/sửa món (React Hook Form + Zod)
+- [x] Tích hợp upload ảnh lên Firebase Storage (có compress)
+- [x] Tạo component `CategoryManager` — CRUD category
 
 ---
 
 ## Phase 4 — Quản lý Bàn & QR
 
-- [ ] Tạo Firestore service: `tableService.ts` (CRUD tables)
-- [ ] Tạo trang `/admin/tables` — danh sách bàn
-- [ ] Tạo component `TableCard` — hiển thị bàn + trạng thái
-- [ ] Generate QR code cho từng bàn (`qrcode.react`)
-- [ ] Tính năng download QR dạng PNG
+- [x] Tạo Firestore service: `tableService.ts` (CRUD tables)
+- [x] Tạo trang `/admin/tables` — danh sách bàn
+- [x] Tạo component `TableCard` — hiển thị bàn + trạng thái
+- [x] Generate QR code cho từng bàn (`qrcode.react`)
+- [x] Tính năng download QR dạng PNG
 
 ---
 
 ## Phase 5 — Customer Menu Page
 
-- [ ] Tạo trang `/menu/[tableId]` — validate tableId, fetch menu
-- [ ] Tạo component `MenuCategory` — tabs/scroll theo category
-- [ ] Tạo component `MenuItem` — ảnh, tên, giá, nút thêm giỏ
-- [ ] Tạo `useCartStore` (Zustand) — quản lý giỏ hàng
-- [ ] Tạo component `CartDrawer` — xem giỏ, tăng/giảm số lượng
-- [ ] Tạo form đặt order — tên khách, ghi chú, confirm
-- [ ] Xử lý submit order — write Firestore `orders/`
+- [x] Tạo trang `/menu/[tableId]` — validate tableId, fetch menu
+- [x] Tạo component `MenuCategory` — tabs/scroll theo category
+- [x] Tạo component `MenuItem` — ảnh, tên, giá, nút thêm giỏ
+- [x] Tạo `useCartStore` (Zustand) — quản lý giỏ hàng
+- [x] Tạo component `CartDrawer` — xem giỏ, tăng/giảm số lượng
+- [x] Tạo form đặt order — tên khách, ghi chú, confirm
+- [x] Xử lý submit order — write Firestore `orders/`
 
 ---
 
 ## Phase 6 — Order Realtime
 
-- [ ] Tạo Firestore service: `orderService.ts`
-- [ ] Tạo hook `useOrders` — onSnapshot active orders
-- [ ] Tạo trang `/admin/dashboard` — kanban/list order realtime
-- [ ] Tạo component `OrderCard` — thông tin order + nút cập nhật status
-- [ ] Xử lý cập nhật trạng thái order
-- [ ] Tạo trang `/order/[orderId]` — customer xem trạng thái realtime
+- [x] Tạo Firestore service: `orderService.ts`
+- [x] Tạo hook `useOrders` — onSnapshot active orders
+- [x] Tạo trang `/admin/dashboard` — kanban/list order realtime
+- [x] Tạo component `OrderCard` — thông tin order + nút cập nhật status
+- [x] Xử lý cập nhật trạng thái order
+- [x] Tạo trang `/order/[orderId]` — customer xem trạng thái realtime
 
 ---
 
 ## Phase 7 — Thống kê Doanh thu
 
-- [ ] Tạo query Firestore — aggregate orders theo ngày/tuần/tháng
-- [ ] Tạo trang `/admin/revenue` — overview cards
-- [ ] Tạo biểu đồ doanh thu theo ngày (Recharts LineChart)
-- [ ] Tạo biểu đồ top món bán chạy (Recharts BarChart)
-- [ ] Tạo bảng lịch sử order completed
+- [x] Tạo query Firestore — aggregate orders theo ngày/tuần/tháng
+- [x] Tạo trang `/admin/revenue` — overview cards
+- [x] Tạo biểu đồ doanh thu theo ngày (Recharts LineChart)
+- [x] Tạo biểu đồ top món bán chạy (Recharts BarChart)
+- [x] Tạo bảng lịch sử order completed
 
 ---
 
 ## Phase 8 — Polish & Deploy
 
-- [ ] Responsive check toàn bộ trang (mobile-first)
-- [ ] Loading states + error states cho mọi async action
-- [ ] Toast notifications (thêm giỏ hàng, đặt order thành công, lỗi...)
-- [ ] Empty states cho danh sách trống
-- [ ] Tối ưu performance: lazy load ảnh, pagination order history
-- [ ] Deploy lên Vercel
-- [ ] Setup Firebase Security Rules production
+- [x] Responsive check toàn bộ trang (mobile-first)
+- [x] Loading states + error states cho mọi async action
+- [x] Toast notifications (thêm giỏ hàng, đặt order thành công, lỗi...)
+- [x] Empty states cho danh sách trống
+- [x] Tối ưu performance: lazy load ảnh, pagination order history
+- [x] Deploy lên Vercel
+- [x] Setup Firebase Security Rules production
 
 ---
 
