@@ -12,6 +12,7 @@ import {
   updateDoc,
   type Unsubscribe,
 } from "firebase/firestore";
+import { cache } from "react";
 import { db } from "@/lib/firebase/config";
 import type { TableDocument, TableFormValues } from "@/types/table";
 
@@ -39,7 +40,7 @@ export async function getTables(): Promise<TableDocument[]> {
   return snapshot.docs.map((item) => mapTableDoc(item.id, item.data()));
 }
 
-export async function getTable(tableId: string): Promise<TableDocument | null> {
+export const getTable = cache(async (tableId: string): Promise<TableDocument | null> => {
   const docRef = doc(db, TABLES_COLLECTION, tableId);
   const snapshot = await getDoc(docRef);
 
@@ -48,7 +49,7 @@ export async function getTable(tableId: string): Promise<TableDocument | null> {
   }
 
   return mapTableDoc(snapshot.id, snapshot.data());
-}
+});
 
 export function subscribeTables(
   callback: (tables: TableDocument[]) => void

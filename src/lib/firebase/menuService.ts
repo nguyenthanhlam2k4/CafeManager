@@ -12,6 +12,7 @@ import {
   where,
   type Unsubscribe,
 } from "firebase/firestore";
+import { cache } from "react";
 import imageCompression from "browser-image-compression";
 import { db } from "@/lib/firebase/config";
 import { DEFAULT_CATEGORIES } from "@/constants/menu";
@@ -134,15 +135,15 @@ export async function getMenuItems(): Promise<MenuItemDocument[]> {
   );
 }
 
-export async function getMenuItemById(
+export const getMenuItemById = cache(async (
   id: string
-): Promise<MenuItemDocument | null> {
+): Promise<MenuItemDocument | null> => {
   const { getDoc, doc: firestoreDoc } = await import("firebase/firestore");
   const ref = firestoreDoc(db, MENU_ITEMS_COLLECTION, id);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
   return mapMenuItemDoc(snap.id, snap.data() as Record<string, unknown>);
-}
+});
 
 export function subscribeMenuItems(
   callback: (items: MenuItemDocument[]) => void

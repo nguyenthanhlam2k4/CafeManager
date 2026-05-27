@@ -134,7 +134,7 @@ function AdminTablesPage() {
                 <div className="glass p-6 text-center">
                   <span style={{ fontSize: 32, marginBottom: 12, display: "block" }}>📌</span>
                   <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-                    Chọn "Thêm Bàn" hoặc "Sửa" để quản lý thông tin bàn.
+                    Chọn &quot;Thêm Bàn&quot; hoặc &quot;Sửa&quot; để quản lý thông tin bàn.
                   </p>
                   <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 8 }}>
                     Khách hàng quét mã QR trên bàn để xem menu và đặt món.

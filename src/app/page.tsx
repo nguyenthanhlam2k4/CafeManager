@@ -1,12 +1,10 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { getMenuItems, getCategories } from "@/lib/firebase/menuService";
+import { getMenuItems } from "@/lib/firebase/menuService";
 import type { MenuItemDocument } from "@/types/menu";
-import type { CategoryDocument } from "@/types/category";
 import Navbar from "@/components/Navbar";
+import FeaturedCarousel from "@/components/FeaturedCarousel";
+import NewsletterSection from "@/components/NewsletterSection";
 
 // ─── STATIC FALLBACK DATA ────────────────────────────────────────────────────
 
@@ -17,9 +15,7 @@ const FALLBACK_ITEMS = [
   { id: "f4", name: "Bánh Chocolate Berry", price: 85000, imageUrl: "/food_cake.png", categoryId: "", isAvailable: true, isDeleted: false, description: "", createdAt: null, updatedAt: null },
   { id: "f5", name: "Cà phê Latte", price: 55000, imageUrl: "/food_latte.png", categoryId: "", isAvailable: true, isDeleted: false, description: "", createdAt: null, updatedAt: null },
   { id: "f6", name: "Iced Latte", price: 60000, imageUrl: "/food_ice_latte.png", categoryId: "", isAvailable: true, isDeleted: false, description: "", createdAt: null, updatedAt: null },
-] as MenuItemDocument[];
-
-
+] as unknown as MenuItemDocument[];
 
 const WHY_ITEMS = [
   { icon: "☕", title: "Cà phê Đặc Biệt", desc: "Hạt từ các nông trại uy tín, rang và pha chế bởi barista chuyên nghiệp." },
@@ -44,41 +40,7 @@ function getItemImage(item: MenuItemDocument): string {
   return item.imageUrl || "/food_latte.png";
 }
 
-// ─── HOOK: fetch menu data ────────────────────────────────────────────────────
-
-function useMenuData() {
-  const [items, setItems] = useState<MenuItemDocument[]>([]);
-  const [categories, setCategories] = useState<CategoryDocument[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const [menuItems, cats] = await Promise.all([getMenuItems(), getCategories()]);
-        if (!cancelled) {
-          setItems(menuItems.filter((i) => i.isAvailable));
-          setCategories(cats);
-        }
-      } catch {
-        // silent fallback — use static data
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
-  const displayItems = items.length > 0 ? items : FALLBACK_ITEMS;
-  const breakfastItems = displayItems.slice(0, 4);
-  const featuredItems = displayItems.slice(0, 5);
-
-  return { items: displayItems, breakfastItems, featuredItems, categories, loading };
-}
-
 // ─── COMPONENTS ──────────────────────────────────────────────────────────────
-
 
 function HeroSection() {
   return (
@@ -136,7 +98,7 @@ function HeroSection() {
   );
 }
 
-function BreakfastSection({ items, loading }: { items: MenuItemDocument[]; loading: boolean }) {
+function BreakfastSection({ items }: { items: MenuItemDocument[] }) {
   const TAGS = ["Bestseller", "Healthy", "Mới", "Dessert", "Đặc biệt", "Phổ biến"];
 
   return (
@@ -151,29 +113,18 @@ function BreakfastSection({ items, loading }: { items: MenuItemDocument[]; loadi
         </div>
 
         <div className="homepage-food-grid">
-          {loading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="homepage-food-card homepage-food-card--skeleton">
-                  <div className="homepage-food-card__img-wrap homepage-skeleton" />
-                  <div className="homepage-food-card__body">
-                    <div className="homepage-skeleton" style={{ height: 14, borderRadius: 6, marginBottom: 8 }} />
-                    <div className="homepage-skeleton" style={{ height: 14, width: "50%", borderRadius: 6 }} />
-                  </div>
-                </div>
-              ))
-            : items.map((item, i) => (
-                <div key={item.id} className="homepage-food-card" id={`breakfast-item-${item.id}`}>
-                  <div className="homepage-food-card__img-wrap">
-                    <Image src={getItemImage(item)} alt={item.name} fill className="homepage-food-card__img" />
-                    <span className="homepage-food-card__tag">{TAGS[i % TAGS.length]}</span>
-                  </div>
-                  <div className="homepage-food-card__body">
-                    <div className="homepage-food-card__name">{item.name}</div>
-                    <div className="homepage-food-card__price">{formatPrice(item.price)}</div>
-                  </div>
-                </div>
-              ))
-          }
+          {items.map((item, i) => (
+            <div key={item.id} className="homepage-food-card" id={`breakfast-item-${item.id}`}>
+              <div className="homepage-food-card__img-wrap">
+                <Image src={getItemImage(item)} alt={item.name} fill className="homepage-food-card__img" />
+                <span className="homepage-food-card__tag">{TAGS[i % TAGS.length]}</span>
+              </div>
+              <div className="homepage-food-card__body">
+                <div className="homepage-food-card__name">{item.name}</div>
+                <div className="homepage-food-card__price">{formatPrice(item.price)}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -202,82 +153,6 @@ function WhySection() {
   );
 }
 
-function FeaturedCarousel({ items, loading }: { items: MenuItemDocument[]; loading: boolean }) {
-  const [current, setCurrent] = useState(0);
-  const VISIBLE = 3;
-  const total = items.length;
-
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total]);
-  const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total]);
-
-  const getVisible = () => {
-    if (total === 0) return [];
-    const result = [];
-    for (let i = 0; i < Math.min(VISIBLE, total); i++) {
-      result.push(items[(current + i) % total]);
-    }
-    return result;
-  };
-
-  return (
-    <section className="homepage-carousel-section" id="featured">
-      <div className="homepage-carousel-header">
-        <div>
-          <h2 className="homepage-section__title" style={{ color: "#1c1008" }}>Hôm Nay Thử Gì?</h2>
-          <Link href="#breakfast" className="btn-homepage-ghost" style={{ marginTop: 12 }} id="full-menu-link">
-            Xem thêm →
-          </Link>
-        </div>
-        {total > VISIBLE && (
-          <div className="homepage-carousel-controls">
-            <button className="homepage-carousel-btn" onClick={prev} id="carousel-prev" aria-label="Trước">‹</button>
-            <button className="homepage-carousel-btn" onClick={next} id="carousel-next" aria-label="Tiếp">›</button>
-          </div>
-        )}
-      </div>
-
-      <div className="homepage-carousel-track">
-        {loading
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="homepage-carousel-item">
-                <div className="homepage-carousel-item__img-wrap homepage-skeleton" />
-                <div className="homepage-carousel-item__body">
-                  <div className="homepage-skeleton" style={{ height: 16, borderRadius: 6, marginBottom: 8 }} />
-                  <div className="homepage-skeleton" style={{ height: 16, width: "50%", borderRadius: 6 }} />
-                </div>
-              </div>
-            ))
-          : getVisible().map((item, i) => (
-              <div key={`${item.id}-${i}`} className="homepage-carousel-item" id={`featured-item-${item.id}`}>
-                <div className="homepage-carousel-item__img-wrap">
-                  <Image src={getItemImage(item)} alt={item.name} fill className="homepage-carousel-item__img" />
-                </div>
-                <div className="homepage-carousel-item__body">
-                  <div className="homepage-carousel-item__name">{item.name}</div>
-                  <div className="homepage-carousel-item__price">{formatPrice(item.price)}</div>
-                </div>
-              </div>
-            ))
-        }
-      </div>
-
-      {total > VISIBLE && (
-        <div className="homepage-carousel-dots">
-          {items.map((_, i) => (
-            <button
-              key={i}
-              className={`homepage-carousel-dot ${i === current ? "homepage-carousel-dot--active" : ""}`}
-              onClick={() => setCurrent(i)}
-              aria-label={`Slide ${i + 1}`}
-              id={`carousel-dot-${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
 function InfoCardsSection() {
   return (
     <section className="homepage-info-section" id="gallery">
@@ -295,47 +170,6 @@ function InfoCardsSection() {
             </div>
           </div>
         ))}
-      </div>
-    </section>
-  );
-}
-
-function NewsletterSection() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) setSubmitted(true);
-  };
-
-  return (
-    <section className="homepage-newsletter" id="contact">
-      <div className="homepage-newsletter__inner">
-        <div className="homepage-newsletter__left">
-          <div className="homepage-newsletter__plant">🪴</div>
-          <div>
-            <h2 className="homepage-newsletter__title">Ghé thăm chúng tôi!<br />Luôn chào đón bạn.</h2>
-            <p className="homepage-newsletter__desc">
-              Đăng ký nhận tin để nhận ưu đãi và phần quà đặc biệt cho cà phê đầu tiên của bạn.
-            </p>
-          </div>
-        </div>
-        <div className="homepage-newsletter__right">
-          {submitted ? (
-            <div className="homepage-newsletter__success">✅ Cảm ơn bạn đã đăng ký! Kiểm tra hộp thư của bạn.</div>
-          ) : (
-            <form className="homepage-newsletter__form" onSubmit={handleSubmit} id="newsletter-form">
-              <input type="email" className="homepage-newsletter__input" placeholder="Email của bạn" value={email} onChange={(e) => setEmail(e.target.value)} required id="newsletter-email" />
-              <button type="submit" className="btn-homepage-primary" id="newsletter-submit">Đăng ký</button>
-            </form>
-          )}
-          <div className="homepage-newsletter__socials">
-            <a href="#" className="homepage-social-icon" aria-label="Instagram" id="social-instagram">📷</a>
-            <a href="#" className="homepage-social-icon" aria-label="TikTok" id="social-tiktok">🎵</a>
-            <a href="#" className="homepage-social-icon" aria-label="Zalo" id="social-zalo">💬</a>
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -384,17 +218,31 @@ function Footer() {
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 
-export default function HomePage() {
-  const { breakfastItems, featuredItems, loading } = useMenuData();
+export const revalidate = 60;
+
+export default async function HomePage() {
+  let menuItems: MenuItemDocument[] = [];
+  try {
+    menuItems = await getMenuItems();
+  } catch (error) {
+    console.error("Failed to fetch menu items on server:", error);
+  }
+
+  const items = menuItems.filter((i) => i.isAvailable);
+  const displayItems = items.length > 0 ? items : FALLBACK_ITEMS;
+  const breakfastItems = displayItems.slice(0, 4);
+  const featuredItems = displayItems.slice(0, 5);
+
+  const safeFeaturedItems = JSON.parse(JSON.stringify(featuredItems));
 
   return (
     <div className="homepage-root">
       <Navbar />
       <main>
         <HeroSection />
-        <BreakfastSection items={breakfastItems} loading={loading} />
+        <BreakfastSection items={breakfastItems} />
         <WhySection />
-        <FeaturedCarousel items={featuredItems} loading={loading} />
+        <FeaturedCarousel items={safeFeaturedItems} />
         <InfoCardsSection />
         <NewsletterSection />
       </main>
